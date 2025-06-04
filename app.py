@@ -10,8 +10,15 @@ import json
 from datetime import datetime, timedelta
 import os
 from dotenv import load_dotenv
+import csv
+import logging
+from datetime import datetime
 
 load_dotenv()
+
+# Setup logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 app = Flask(__name__)
 CORS(app)
@@ -149,6 +156,92 @@ class OrderBlockDetector:
 
         return df
 
+    def generate_trading_signals(self, df):
+        """Generate trading signals based on Order Blocks"""
+        signals = []
+        current_price = df['close'].iloc[-1]
+
+        # Lấy các Order Blocks gần đây (trong 50 candles cuối)
+        recent_data = df.tail(50)
+
+        # Bullish Order Blocks (Long signals)
+        bullish_obs = recent_data[recent_data['bullish_ob']]
+        for idx, ob in bullish_obs.iterrows():
+            if not pd.isna(ob['ob_high']) and not pd.isna(ob['ob_low']):
+                # Entry: khi giá retest về vùng OB
+                entry_zone_high = ob['ob_high']
+                entry_zone_low = ob['ob_low']
+                entry_price = (entry_zone_high + entry_zone_low) / 2
+
+                # Stop Loss: dưới OB low
+                stop_loss = entry_zone_low * 0.995  # 0.5% buffer
+
+                # Take Profit: 1:2 Risk/Reward ratio
+                risk = entry_price - stop_loss
+                take_profit = entry_price + (risk * 2)
+
+                # Risk/Reward calculation
+                risk_percentage = (
+                    (entry_price - stop_loss) / entry_price) * 100
+                reward_percentage = (
+                    (take_profit - entry_price) / entry_price) * 100
+
+                signal = {
+                    'type': 'LONG',
+                    'entry_price': round(entry_price, 2),
+                    'entry_zone_high': round(entry_zone_high, 2),
+                    'entry_zone_low': round(entry_zone_low, 2),
+                    'stop_loss': round(stop_loss, 2),
+                    'take_profit': round(take_profit, 2),
+                    'risk_percentage': round(risk_percentage, 2),
+                    'reward_percentage': round(reward_percentage, 2),
+                    'rr_ratio': '1:2',
+                    'timestamp': ob['timestamp'],
+                    'status': 'ACTIVE' if current_price <= entry_zone_high * 1.02 else 'MISSED',
+                    'description': f'Long từ Bullish OB tại {entry_price}'
+                }
+                signals.append(signal)
+
+        # Bearish Order Blocks (Short signals)
+        bearish_obs = recent_data[recent_data['bearish_ob']]
+        for idx, ob in bearish_obs.iterrows():
+            if not pd.isna(ob['ob_high']) and not pd.isna(ob['ob_low']):
+                # Entry: khi giá retest về vùng OB
+                entry_zone_high = ob['ob_high']
+                entry_zone_low = ob['ob_low']
+                entry_price = (entry_zone_high + entry_zone_low) / 2
+
+                # Stop Loss: trên OB high
+                stop_loss = entry_zone_high * 1.005  # 0.5% buffer
+
+                # Take Profit: 1:2 Risk/Reward ratio
+                risk = stop_loss - entry_price
+                take_profit = entry_price - (risk * 2)
+
+                # Risk/Reward calculation
+                risk_percentage = (
+                    (stop_loss - entry_price) / entry_price) * 100
+                reward_percentage = (
+                    (entry_price - take_profit) / entry_price) * 100
+
+                signal = {
+                    'type': 'SHORT',
+                    'entry_price': round(entry_price, 2),
+                    'entry_zone_high': round(entry_zone_high, 2),
+                    'entry_zone_low': round(entry_zone_low, 2),
+                    'stop_loss': round(stop_loss, 2),
+                    'take_profit': round(take_profit, 2),
+                    'risk_percentage': round(risk_percentage, 2),
+                    'reward_percentage': round(reward_percentage, 2),
+                    'rr_ratio': '1:2',
+                    'timestamp': ob['timestamp'],
+                    'status': 'ACTIVE' if current_price >= entry_zone_low * 0.98 else 'MISSED',
+                    'description': f'Short từ Bearish OB tại {entry_price}'
+                }
+                signals.append(signal)
+
+        return signals
+
     def create_chart(self, df, symbol):
         """Create interactive Plotly chart with Order Blocks"""
         fig = make_subplots(
@@ -260,9 +353,140 @@ class OrderBlockDetector:
 detector = OrderBlockDetector()
 
 
+class UserLogger:
+    def __init__(self, log_file='user_activity_log.csv'):
+        self.log_file = log_file
+        self.init_log_file()
+
+    def init_log_file(self):
+        """Initialize CSV log file with headers if it doesn't exist"""
+        try:
+            if not os.path.exists(self.log_file):
+                with open(self.log_file, 'w', newline='', encoding='utf-8') as file:
+                    writer = csv.writer(file)
+                    writer.writerow([
+                        'timestamp', 'username', 'action', 'symbol',
+                        'timeframe', 'details', 'ip_address', 'session_id'
+                    ])
+                logger.info(f"Created new log file: {self.log_file}")
+        except Exception as e:
+            logger.error(f"Error initializing log file: {e}")
+
+    def log_activity(self, username, action, symbol=None, timeframe=None,
+                     details=None, ip_address=None, session_id=None):
+        """Log user activity to CSV file"""
+        try:
+            timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+
+            with open(self.log_file, 'a', newline='', encoding='utf-8') as file:
+                writer = csv.writer(file)
+                writer.writerow([
+                    timestamp, username, action, symbol or '',
+                    timeframe or '', details or '', ip_address or '', session_id or ''
+                ])
+
+            logger.info(f"Logged activity: {username} - {action}")
+            return True
+        except Exception as e:
+            logger.error(f"Error logging activity: {e}")
+            return False
+
+    def get_user_stats(self, username):
+        """Get usage statistics for a specific user"""
+        try:
+            stats = {
+                'total_sessions': 0,
+                'total_analyses': 0,
+                'favorite_symbols': {},
+                'favorite_timeframes': {},
+                'last_activity': None,
+                'first_activity': None
+            }
+
+            if not os.path.exists(self.log_file):
+                return stats
+
+            with open(self.log_file, 'r', encoding='utf-8') as file:
+                reader = csv.DictReader(file)
+                for row in reader:
+                    if row['username'].lower() == username.lower():
+                        # Count activities
+                        if row['action'] == 'LOGIN':
+                            stats['total_sessions'] += 1
+                        elif row['action'] == 'ANALYZE':
+                            stats['total_analyses'] += 1
+
+                            # Track favorite symbols
+                            symbol = row['symbol']
+                            if symbol:
+                                stats['favorite_symbols'][symbol] = stats['favorite_symbols'].get(
+                                    symbol, 0) + 1
+
+                            # Track favorite timeframes
+                            timeframe = row['timeframe']
+                            if timeframe:
+                                stats['favorite_timeframes'][timeframe] = stats['favorite_timeframes'].get(
+                                    timeframe, 0) + 1
+
+                        # Track activity dates
+                        activity_date = row['timestamp']
+                        if not stats['first_activity']:
+                            stats['first_activity'] = activity_date
+                        stats['last_activity'] = activity_date
+
+            return stats
+        except Exception as e:
+            logger.error(f"Error getting user stats: {e}")
+            return {}
+
+
+user_logger = UserLogger()
+
+
 @app.route('/')
 def index():
     return render_template('index.html')
+
+
+@app.route('/api/login', methods=['POST'])
+def login_user():
+    """Log user login activity"""
+    try:
+        data = request.get_json()
+        username = data.get('username', '').strip()
+
+        if not username:
+            return jsonify({'error': 'Username is required'}), 400
+
+        # Log login activity
+        user_logger.log_activity(
+            username=username,
+            action='LOGIN',
+            details='User logged in',
+            ip_address=request.remote_addr
+        )
+
+        # Get user stats
+        stats = user_logger.get_user_stats(username)
+
+        return jsonify({
+            'success': True,
+            'message': f'Welcome back {username}!',
+            'user_stats': stats
+        })
+
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
+@app.route('/api/user_stats/<username>')
+def get_user_stats(username):
+    """Get user statistics"""
+    try:
+        stats = user_logger.get_user_stats(username)
+        return jsonify({'user_stats': stats})
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
 
 @app.route('/api/analyze', methods=['POST'])
@@ -271,6 +495,17 @@ def analyze():
         data = request.get_json()
         symbol = data.get('symbol', 'BTC/USDT')
         timeframe = data.get('timeframe', '1h')
+        username = data.get('username', 'Anonymous')
+
+        # Log analysis activity
+        user_logger.log_activity(
+            username=username,
+            action='ANALYZE',
+            symbol=symbol,
+            timeframe=timeframe,
+            details=f'Analyzed {symbol} on {timeframe} timeframe',
+            ip_address=request.remote_addr
+        )
 
         # Fetch data
         df = detector.fetch_ohlcv_data(symbol, timeframe)
@@ -281,6 +516,9 @@ def analyze():
         df = detector.find_swing_highs_lows(df)
         df = detector.detect_break_of_structure(df)
         df = detector.detect_order_blocks(df)
+
+        # Generate trading signals
+        trading_signals = detector.generate_trading_signals(df)
 
         # Create chart
         fig = detector.create_chart(df, symbol)
@@ -294,6 +532,11 @@ def analyze():
         bullish_bos = len(df[df['bullish_bos']])
         bearish_bos = len(df[df['bearish_bos']])
 
+        # Current price info
+        current_price = df['close'].iloc[-1]
+        price_change = (
+            (current_price - df['open'].iloc[0]) / df['open'].iloc[0]) * 100
+
         return jsonify({
             'chart': chart_json,
             'stats': {
@@ -301,8 +544,11 @@ def analyze():
                 'bearish_obs': bearish_obs,
                 'bullish_bos': bullish_bos,
                 'bearish_bos': bearish_bos,
-                'total_candles': len(df)
-            }
+                'total_candles': len(df),
+                'current_price': round(current_price, 2),
+                'price_change': round(price_change, 2)
+            },
+            'trading_signals': trading_signals
         })
 
     except Exception as e:
@@ -317,6 +563,61 @@ def get_symbols():
         symbols = [symbol for symbol in markets.keys() if '/USDT' in symbol]
         symbols = sorted(symbols[:50])  # Limit to top 50 for performance
         return jsonify({'symbols': symbols})
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
+@app.route('/api/logs/<username>')
+def get_user_logs(username):
+    """Get recent logs for a specific user"""
+    try:
+        logs = []
+        limit = request.args.get('limit', 20, type=int)
+
+        if os.path.exists(user_logger.log_file):
+            with open(user_logger.log_file, 'r', encoding='utf-8') as file:
+                reader = csv.DictReader(file)
+                for row in reader:
+                    if row['username'].lower() == username.lower():
+                        logs.append(row)
+
+        # Return most recent logs first
+        logs = logs[-limit:] if len(logs) > limit else logs
+        logs.reverse()
+
+        return jsonify({'logs': logs})
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
+@app.route('/api/logs/download/<username>')
+def download_user_logs(username):
+    """Download user logs as CSV file"""
+    try:
+        from flask import send_file
+        import tempfile
+
+        # Create temporary file with user-specific logs
+        temp_file = tempfile.NamedTemporaryFile(
+            mode='w', delete=False, suffix='.csv', encoding='utf-8')
+
+        with open(user_logger.log_file, 'r', encoding='utf-8') as source_file:
+            reader = csv.DictReader(source_file)
+            writer = csv.DictWriter(temp_file, fieldnames=reader.fieldnames)
+            writer.writeheader()
+
+            for row in reader:
+                if row['username'].lower() == username.lower():
+                    writer.writerow(row)
+
+        temp_file.close()
+
+        return send_file(
+            temp_file.name,
+            as_attachment=True,
+            download_name=f'{username}_activity_log.csv',
+            mimetype='text/csv'
+        )
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 

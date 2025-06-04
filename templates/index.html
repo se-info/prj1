@@ -31,15 +31,199 @@
         .form-select, .btn {
             background: rgba(255, 255, 255, 0.1);
             border: 1px solid rgba(255, 255, 255, 0.2);
-            color: #ffffff;
+            color: #ffffff !important;
             border-radius: 10px;
+        }
+        
+        .form-select option {
+            background: #2a2a2a !important;
+            color: #ffffff !important;
+            padding: 8px;
+        }
+        
+        .form-select option:hover {
+            background: #3a3a3a !important;
         }
         
         .form-select:focus, .btn:focus {
             background: rgba(255, 255, 255, 0.15);
             border-color: #00d4ff;
             box-shadow: 0 0 0 0.2rem rgba(0, 212, 255, 0.25);
-            color: #ffffff;
+            color: #ffffff !important;
+        }
+        
+        /* Đảm bảo text hiển thị rõ trên tất cả trình duyệt */
+        .form-label {
+            color: #ffffff !important;
+            font-weight: 500;
+        }
+        
+        .form-select::-webkit-input-placeholder {
+            color: #cccccc !important;
+        }
+        
+        .form-select:-moz-placeholder {
+            color: #cccccc !important;
+        }
+        
+        /* Fix cho dropdown trên các trình duyệt khác nhau */
+        select.form-select {
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23ffffff' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 0.75rem center;
+            background-size: 16px 12px;
+        }
+        
+        /* Cải thiện hiển thị text */
+        .enhanced-select {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%) !important;
+            border: 2px solid rgba(0, 212, 255, 0.3) !important;
+            color: #ffffff !important;
+            font-weight: 500;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+        }
+        
+        .enhanced-select:focus {
+            border-color: #00d4ff !important;
+            box-shadow: 0 0 0 0.25rem rgba(0, 212, 255, 0.25) !important;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.2) 0%, rgba(255, 255, 255, 0.1) 100%) !important;
+        }
+
+        /* Trading Signals Styling */
+        .signal-card {
+            background: linear-gradient(135deg, rgba(0, 255, 0, 0.1) 0%, rgba(0, 200, 0, 0.05) 100%);
+            border: 1px solid rgba(0, 255, 0, 0.3);
+            border-radius: 10px;
+            margin-bottom: 15px;
+            padding: 15px;
+            transition: all 0.3s ease;
+        }
+        
+        .signal-card.short {
+            background: linear-gradient(135deg, rgba(255, 0, 0, 0.1) 0%, rgba(200, 0, 0, 0.05) 100%);
+            border-color: rgba(255, 0, 0, 0.3);
+        }
+        
+        .signal-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 212, 255, 0.2);
+        }
+        
+        .signal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        
+        .signal-type {
+            font-weight: bold;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8em;
+        }
+        
+        .signal-type.long {
+            background: rgba(0, 255, 0, 0.2);
+            color: #00ff00;
+            border: 1px solid #00ff00;
+        }
+        
+        .signal-type.short {
+            background: rgba(255, 0, 0, 0.2);
+            color: #ff0000;
+            border: 1px solid #ff0000;
+        }
+        
+        .signal-status {
+            font-size: 0.8em;
+            padding: 2px 8px;
+            border-radius: 10px;
+        }
+        
+        .signal-status.active {
+            background: rgba(0, 255, 0, 0.2);
+            color: #00ff00;
+        }
+        
+        .signal-status.missed {
+            background: rgba(255, 165, 0, 0.2);
+            color: #ffa500;
+        }
+        
+        .signal-details {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            font-size: 0.9em;
+        }
+        
+        .signal-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 5px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .signal-item:last-child {
+            border-bottom: none;
+        }
+        
+        .signal-value {
+            font-weight: 600;
+            color: #00d4ff;
+        }
+
+        /* User Login & Stats Styling */
+        .user-welcome {
+            background: linear-gradient(135deg, rgba(0, 212, 255, 0.1) 0%, rgba(0, 153, 204, 0.1) 100%);
+            border: 1px solid rgba(0, 212, 255, 0.3);
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .user-stat-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .user-stat-item:last-child {
+            border-bottom: none;
+        }
+        
+        .user-stat-value {
+            font-weight: 600;
+            color: #00d4ff;
+        }
+        
+        .favorite-item {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            padding: 8px 12px;
+            margin: 5px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .btn-info {
+            background: linear-gradient(45deg, #17a2b8, #138496);
+            border: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-info:hover {
+            background: linear-gradient(45deg, #138496, #117a8b);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(23, 162, 184, 0.3);
         }
         
         .btn-primary {
@@ -128,6 +312,49 @@
         <div class="row">
             <!-- Control Panel -->
             <div class="col-lg-3 col-md-4 mb-4">
+                <!-- User Login Card -->
+                <div class="card mb-4" id="loginCard">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">
+                            <i class="fas fa-user me-2 text-info"></i>
+                            Đăng Nhập
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <form id="loginForm">
+                            <div class="mb-3">
+                                <label for="usernameInput" class="form-label">
+                                    <i class="fas fa-user-circle me-1"></i>
+                                    <strong>Tên người dùng</strong>
+                                </label>
+                                <input type="text" class="form-control enhanced-select" id="usernameInput" 
+                                       placeholder="Nhập tên của bạn..." maxlength="50" required>
+                                <small class="text-muted">
+                                    <i class="fas fa-info-circle me-1"></i>
+                                    Để theo dõi lịch sử sử dụng của bạn
+                                </small>
+                            </div>
+                            <button type="submit" class="btn btn-info w-100">
+                                <i class="fas fa-sign-in-alt me-2"></i>
+                                <strong>Đăng Nhập</strong>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- User Stats Card -->
+                <div class="card mb-4" id="userStatsCard" style="display: none;">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">
+                            <i class="fas fa-chart-pie me-2 text-success"></i>
+                            Thống Kê Người Dùng
+                        </h5>
+                    </div>
+                    <div class="card-body" id="userStatsContent">
+                        <!-- User stats will be populated here -->
+                    </div>
+                </div>
+
                 <div class="card">
                     <div class="card-header">
                         <h5 class="card-title mb-0">
@@ -139,32 +366,44 @@
                         <form id="analysisForm">
                             <div class="mb-3">
                                 <label for="symbolSelect" class="form-label">
-                                    <i class="fas fa-coins me-1"></i>
-                                    Trading Pair
+                                    <i class="fas fa-coins me-1 text-info"></i>
+                                    <strong>Trading Pair</strong>
                                 </label>
-                                <select class="form-select" id="symbolSelect">
-                                    <option value="BTC/USDT">BTC/USDT</option>
-                                    <option value="ETH/USDT">ETH/USDT</option>
-                                    <option value="BNB/USDT">BNB/USDT</option>
+                                <select class="form-select enhanced-select" id="symbolSelect">
+                                    <option value="BTC/USDT" style="background: #2a2a2a !important; color: #ffffff !important;">🪙 BTC/USDT</option>
+                                    <option value="ETH/USDT" style="background: #2a2a2a !important; color: #ffffff !important;">⚡ ETH/USDT</option>
+                                    <option value="BNB/USDT" style="background: #2a2a2a !important; color: #ffffff !important;">🔸 BNB/USDT</option>
+                                    <option value="ADA/USDT" style="background: #2a2a2a !important; color: #ffffff !important;">♠️ ADA/USDT</option>
+                                    <option value="DOT/USDT" style="background: #2a2a2a !important; color: #ffffff !important;">⚪ DOT/USDT</option>
+                                    <option value="SOL/USDT" style="background: #2a2a2a !important; color: #ffffff !important;">☀️ SOL/USDT</option>
                                 </select>
+                                <small class="text-muted">
+                                    <i class="fas fa-info-circle me-1"></i>
+                                    Chọn cặp crypto để phân tích
+                                </small>
                             </div>
                             
                             <div class="mb-3">
                                 <label for="timeframeSelect" class="form-label">
-                                    <i class="fas fa-clock me-1"></i>
-                                    Timeframe
+                                    <i class="fas fa-clock me-1 text-warning"></i>
+                                    <strong>Timeframe</strong>
                                 </label>
-                                <select class="form-select" id="timeframeSelect">
-                                    <option value="15m">15 Minutes</option>
-                                    <option value="1h" selected>1 Hour</option>
-                                    <option value="4h">4 Hours</option>
-                                    <option value="1d">1 Day</option>
+                                <select class="form-select enhanced-select" id="timeframeSelect">
+                                    <option value="5m" style="background: #2a2a2a !important; color: #ffffff !important;">⚡ 5 Minutes (Scalping)</option>
+                                    <option value="15m" style="background: #2a2a2a !important; color: #ffffff !important;">🏃 15 Minutes (Day Trading)</option>
+                                    <option value="1h" selected style="background: #2a2a2a !important; color: #ffffff !important;">⏰ 1 Hour (Swing Trading)</option>
+                                    <option value="4h" style="background: #2a2a2a !important; color: #ffffff !important;">📈 4 Hours (Position Trading)</option>
+                                    <option value="1d" style="background: #2a2a2a !important; color: #ffffff !important;">📊 1 Day (Long Term)</option>
                                 </select>
+                                <small class="text-muted">
+                                    <i class="fas fa-info-circle me-1"></i>
+                                    Khung thời gian cho phân tích
+                                </small>
                             </div>
                             
-                            <button type="submit" class="btn btn-primary w-100">
+                            <button type="submit" class="btn btn-primary w-100 py-3">
                                 <i class="fas fa-search me-2"></i>
-                                Analyze Order Blocks
+                                <strong>Phân Tích Order Blocks</strong>
                             </button>
                         </form>
                         
@@ -200,15 +439,35 @@
                                 <div class="h4 text-danger" id="bearishOBs">0</div>
                                 <small>Bearish OBs</small>
                             </div>
-                            <div class="col-6">
+                            <div class="col-6 mb-3">
                                 <div class="h5 text-info" id="bullishBOS">0</div>
                                 <small>Bullish BOS</small>
                             </div>
-                            <div class="col-6">
+                            <div class="col-6 mb-3">
                                 <div class="h5 text-warning" id="bearishBOS">0</div>
                                 <small>Bearish BOS</small>
                             </div>
+                            <div class="col-12 mt-2 pt-2 border-top">
+                                <div class="h5 text-primary" id="currentPrice">$0.00</div>
+                                <small>Current Price</small>
+                                <div class="mt-1">
+                                    <span class="badge" id="priceChangeBadge">0.00%</span>
+                                </div>
+                            </div>
                         </div>
+                    </div>
+                </div>
+
+                <!-- Trading Signals -->
+                <div class="card mt-4" id="tradingSignalsCard" style="display: none;">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">
+                            <i class="fas fa-chart-line me-2 text-success"></i>
+                            Gợi Ý Giao Dịch
+                        </h5>
+                    </div>
+                    <div class="card-body" id="tradingSignalsContent">
+                        <!-- Trading signals will be populated here -->
                     </div>
                 </div>
 
@@ -272,6 +531,197 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
+        // Global variables
+        let currentUser = null;
+
+        // Handle user login
+        document.getElementById('loginForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const username = document.getElementById('usernameInput').value.trim();
+            
+            if (!username) {
+                alert('Vui lòng nhập tên người dùng!');
+                return;
+            }
+            
+            try {
+                const response = await fetch('/api/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ username: username })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    currentUser = username;
+                    showUserWelcome(username, data.user_stats);
+                    document.getElementById('loginCard').style.display = 'none';
+                } else {
+                    alert(data.error || 'Đăng nhập thất bại!');
+                }
+                
+            } catch (error) {
+                console.error('Login error:', error);
+                alert('Có lỗi xảy ra khi đăng nhập!');
+            }
+        });
+
+        // Show user welcome and stats
+        function showUserWelcome(username, stats) {
+            const userStatsCard = document.getElementById('userStatsCard');
+            const userStatsContent = document.getElementById('userStatsContent');
+            
+            let statsHTML = `
+                <div class="user-welcome">
+                    <h6><i class="fas fa-user-check me-2"></i>Xin chào, <strong>${username}</strong>!</h6>
+                    <small class="text-muted">Đã đăng nhập thành công</small>
+                </div>
+                
+                <div class="user-stat-item">
+                    <span><i class="fas fa-history me-1"></i>Tổng phiên:</span>
+                    <span class="user-stat-value">${stats.total_sessions || 0}</span>
+                </div>
+                
+                <div class="user-stat-item">
+                    <span><i class="fas fa-chart-line me-1"></i>Phân tích:</span>
+                    <span class="user-stat-value">${stats.total_analyses || 0}</span>
+                </div>
+            `;
+            
+            // Favorite symbols
+            if (stats.favorite_symbols && Object.keys(stats.favorite_symbols).length > 0) {
+                statsHTML += `
+                    <div class="mt-3">
+                        <small class="text-muted"><i class="fas fa-star me-1"></i>Symbols ưa thích:</small>
+                `;
+                
+                Object.entries(stats.favorite_symbols)
+                    .sort(([,a], [,b]) => b - a)
+                    .slice(0, 3)
+                    .forEach(([symbol, count]) => {
+                        statsHTML += `
+                            <div class="favorite-item">
+                                <span>${symbol}</span>
+                                <span class="badge bg-info">${count}</span>
+                            </div>
+                        `;
+                    });
+                
+                statsHTML += `</div>`;
+            }
+            
+            // Last activity
+            if (stats.last_activity) {
+                statsHTML += `
+                    <div class="user-stat-item mt-2">
+                        <span><i class="fas fa-clock me-1"></i>Lần cuối:</span>
+                        <span class="user-stat-value" style="font-size: 0.8em;">${new Date(stats.last_activity).toLocaleString('vi-VN')}</span>
+                    </div>
+                `;
+            }
+            
+            // Add action buttons
+            statsHTML += `
+                <div class="mt-3 d-grid gap-2">
+                    <button class="btn btn-outline-info btn-sm" onclick="viewUserLogs('${username}')">
+                        <i class="fas fa-history me-1"></i>Xem Lịch Sử
+                    </button>
+                    <button class="btn btn-outline-success btn-sm" onclick="downloadUserLogs('${username}')">
+                        <i class="fas fa-download me-1"></i>Tải Log CSV
+                    </button>
+                </div>
+            `;
+            
+            userStatsContent.innerHTML = statsHTML;
+            userStatsCard.style.display = 'block';
+        }
+
+        // View user logs
+        async function viewUserLogs(username) {
+            try {
+                const response = await fetch(`/api/logs/${username}?limit=10`);
+                const data = await response.json();
+                
+                if (data.logs && data.logs.length > 0) {
+                    let logsHTML = `
+                        <div class="modal fade" id="logsModal" tabindex="-1">
+                            <div class="modal-dialog modal-lg">
+                                <div class="modal-content" style="background: #1a1a1a; color: white;">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title">
+                                            <i class="fas fa-history me-2"></i>
+                                            Lịch Sử Hoạt Động - ${username}
+                                        </h5>
+                                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <div class="table-responsive">
+                                            <table class="table table-dark table-striped">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Thời gian</th>
+                                                        <th>Hành động</th>
+                                                        <th>Symbol</th>
+                                                        <th>Timeframe</th>
+                                                        <th>Chi tiết</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                    `;
+                    
+                    data.logs.forEach(log => {
+                        const actionIcon = log.action === 'LOGIN' ? 'fas fa-sign-in-alt text-info' : 'fas fa-chart-line text-success';
+                        logsHTML += `
+                            <tr>
+                                <td style="font-size: 0.8em;">${new Date(log.timestamp).toLocaleString('vi-VN')}</td>
+                                <td><i class="${actionIcon} me-1"></i>${log.action}</td>
+                                <td>${log.symbol || '-'}</td>
+                                <td>${log.timeframe || '-'}</td>
+                                <td style="font-size: 0.9em;">${log.details || '-'}</td>
+                            </tr>
+                        `;
+                    });
+                    
+                    logsHTML += `
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    
+                    // Remove existing modal if any
+                    const existingModal = document.getElementById('logsModal');
+                    if (existingModal) {
+                        existingModal.remove();
+                    }
+                    
+                    // Add modal to body
+                    document.body.insertAdjacentHTML('beforeend', logsHTML);
+                    
+                    // Show modal
+                    const modal = new bootstrap.Modal(document.getElementById('logsModal'));
+                    modal.show();
+                } else {
+                    alert('Không có dữ liệu lịch sử!');
+                }
+            } catch (error) {
+                console.error('Error viewing logs:', error);
+                alert('Có lỗi khi xem lịch sử!');
+            }
+        }
+
+        // Download user logs
+        function downloadUserLogs(username) {
+            window.open(`/api/logs/download/${username}`, '_blank');
+        }
+
         // Load available symbols on page load
         async function loadSymbols() {
             try {
@@ -319,7 +769,8 @@
                     },
                     body: JSON.stringify({
                         symbol: symbol,
-                        timeframe: timeframe
+                        timeframe: timeframe,
+                        username: currentUser || 'Anonymous'
                     })
                 });
                 
@@ -338,7 +789,18 @@
                 document.getElementById('bearishOBs').textContent = data.stats.bearish_obs;
                 document.getElementById('bullishBOS').textContent = data.stats.bullish_bos;
                 document.getElementById('bearishBOS').textContent = data.stats.bearish_bos;
+                
+                // Update current price
+                document.getElementById('currentPrice').textContent = `$${data.stats.current_price}`;
+                const priceChangeBadge = document.getElementById('priceChangeBadge');
+                const priceChange = data.stats.price_change;
+                priceChangeBadge.textContent = `${priceChange > 0 ? '+' : ''}${priceChange}%`;
+                priceChangeBadge.className = `badge ${priceChange >= 0 ? 'bg-success' : 'bg-danger'}`;
+                
                 document.getElementById('statsCard').style.display = 'block';
+                
+                // Display trading signals
+                displayTradingSignals(data.trading_signals);
                 
             } catch (error) {
                 console.error('Error:', error);
@@ -359,6 +821,76 @@
                 document.getElementById('loadingDiv').style.display = 'none';
             }
         });
+
+        // Display Trading Signals
+        function displayTradingSignals(signals) {
+            const signalsCard = document.getElementById('tradingSignalsCard');
+            const signalsContent = document.getElementById('tradingSignalsContent');
+            
+            if (!signals || signals.length === 0) {
+                signalsCard.style.display = 'none';
+                return;
+            }
+            
+            let signalsHTML = '';
+            
+            signals.forEach(signal => {
+                const typeClass = signal.type.toLowerCase();
+                const statusClass = signal.status.toLowerCase();
+                
+                signalsHTML += `
+                    <div class="signal-card ${typeClass}">
+                        <div class="signal-header">
+                            <span class="signal-type ${typeClass}">
+                                <i class="fas fa-${signal.type === 'LONG' ? 'arrow-up' : 'arrow-down'} me-1"></i>
+                                ${signal.type}
+                            </span>
+                            <span class="signal-status ${statusClass}">
+                                <i class="fas fa-${signal.status === 'ACTIVE' ? 'check-circle' : 'clock'} me-1"></i>
+                                ${signal.status}
+                            </span>
+                        </div>
+                        
+                        <div class="signal-details">
+                            <div class="signal-item">
+                                <span>📍 Entry Zone:</span>
+                                <span class="signal-value">$${signal.entry_zone_low} - $${signal.entry_zone_high}</span>
+                            </div>
+                            <div class="signal-item">
+                                <span>🎯 Entry Price:</span>
+                                <span class="signal-value">$${signal.entry_price}</span>
+                            </div>
+                            <div class="signal-item">
+                                <span>🛑 Stop Loss:</span>
+                                <span class="signal-value">$${signal.stop_loss}</span>
+                            </div>
+                            <div class="signal-item">
+                                <span>💰 Take Profit:</span>
+                                <span class="signal-value">$${signal.take_profit}</span>
+                            </div>
+                            <div class="signal-item">
+                                <span>⚠️ Risk:</span>
+                                <span class="signal-value">${signal.risk_percentage}%</span>
+                            </div>
+                            <div class="signal-item">
+                                <span>🎁 Reward:</span>
+                                <span class="signal-value">${signal.reward_percentage}%</span>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-2">
+                            <small class="text-muted">
+                                <i class="fas fa-balance-scale me-1"></i>
+                                Risk/Reward: ${signal.rr_ratio}
+                            </small>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            signalsContent.innerHTML = signalsHTML;
+            signalsCard.style.display = 'block';
+        }
 
         // Load symbols when page loads
         document.addEventListener('DOMContentLoaded', function() {
