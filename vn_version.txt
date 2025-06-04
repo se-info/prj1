@@ -1,0 +1,93 @@
+## Version 2: Vietnamese (Tiếng Việt)
+
+### Kế Hoạch Phát Triển Ứng Dụng Phát Hiện Khối Lệnh (Order Block) Crypto
+
+**1. Mục Tiêu Dự Án:**
+Phát triển một ứng dụng có khả năng tự động phát hiện và hiển thị trực quan các Khối Lệnh (Order Block - OB) tiềm năng trên biểu đồ giá tiền điện tử. Logic phát hiện sẽ dựa trên các nguyên tắc được nêu trong tệp "Order Block.pdf" và các Khái niệm Tiền Thông Minh (Smart Money Concepts - SMC) phổ biến.
+
+**2. Tính Năng Chính:**
+*   **Nguồn Dữ Liệu:** Kết nối với API của các sàn giao dịch tiền điện tử (ví dụ: Binance, Bybit, KuCoin) để lấy dữ liệu OHLCV (Mở, Cao, Thấp, Đóng, Khối lượng) lịch sử và thời gian thực.
+*   **Lựa Chọn Cặp Tiền & Khung Thời Gian:** Cho phép người dùng chọn cặp tiền điện tử (ví dụ: BTC/USDT, ETH/USDT) và khung thời gian (ví dụ: 15m, 1H, 4H, 1D).
+*   **Thuật Toán Phát Hiện Khối Lệnh:**
+    *   Xác định các Khối Lệnh Tăng Giá (Bullish OB) tiềm năng (nến giảm cuối cùng trước một động thái tăng mạnh).
+    *   Xác định các Khối Lệnh Giảm Giá (Bearish OB) tiềm năng (nến tăng cuối cùng trước một động thái giảm mạnh).
+    *   Tích hợp các quy tắc "Phá Vỡ Cấu Trúc" (Break of Structure - BOS) để xác thực động thái bứt phá.
+    *   (Tùy chọn) Xác định các Khoảng Trống Mất Cân Bằng/Giá Trị Hợp Lý (Imbalance/FVG) liên quan gần OB.
+    *   Xem xét đặc điểm khối lượng.
+*   **Trực Quan Hóa:**
+    *   Hiển thị biểu đồ OHLCV (nến Nhật).
+    *   Đánh dấu rõ ràng các OB được phát hiện trên biểu đồ (ví dụ: vẽ hình chữ nhật trên nến OB).
+    *   Làm nổi bật điểm BOS.
+*   **Giao Diện Người Dùng (UI):**
+    *   Giao diện đơn giản và trực quan để lựa chọn và xem biểu đồ.
+    *   (Nâng cao tùy chọn) Bảng cài đặt để tùy chỉnh các tham số phát hiện OB (ví dụ: phần trăm động thái bứt phá tối thiểu, khoảng thời gian nhìn lại cho BOS).
+*   **Cảnh Báo (Nâng cao tùy chọn):**
+    *   Thông báo cho người dùng khi một OB mới được phát hiện.
+    *   Thông báo cho người dùng khi giá kiểm tra lại (retest) một OB đã được phát hiện.
+
+**3. Định Nghĩa Khối Lệnh (Dựa trên hiểu biết chung & trọng tâm có thể có của PDF):**
+*   **Bullish OB:** Nến giảm giá (đóng cửa giảm) cuối cùng trước một động thái tăng giá mạnh mẽ phá vỡ một đỉnh đảo chiều (swing high) quan trọng gần đó.
+*   **Bearish OB:** Nến tăng giá (đóng cửa tăng) cuối cùng trước một động thái giảm giá mạnh mẽ phá vỡ một đáy đảo chiều (swing low) quan trọng gần đó.
+*   **Tiêu Chí Cho Động Thái Bứt Phá:** Một chuyển động giá đáng kể tạo ra sự mất cân bằng (FVG) và/hoặc phá vỡ cấu trúc thị trường.
+
+**4. Công Nghệ Kỹ Thuật (Đề xuất):**
+*   **Ngôn Ngữ Lập Trình:** Python (do có nhiều thư viện phong phú cho phân tích dữ liệu, tương tác API và vẽ biểu đồ) hoặc JavaScript (Node.js cho backend, React/Vue/Svelte cho frontend nếu làm web app).
+*   **Thu Thập Dữ Liệu:** Thư viện `ccxt` (Python/JS) để tích hợp API sàn giao dịch.
+*   **Xử Lý Dữ Liệu:** Pandas (Python) để thao tác và phân tích dữ liệu.
+*   **Vẽ Biểu Đồ:**
+    *   Python: `mplfinance`, `Plotly Dash`, hoặc `Bokeh`.
+    *   JavaScript: `TradingView Lightweight Charts`, `Chart.js` với plugin tài chính, hoặc `ApexCharts`.
+*   **Framework UI (nếu là ứng dụng desktop):**
+    *   Python: `PyQt5/6`, `Kivy`, `Tkinter` (cơ bản).
+    *   JavaScript (Desktop): Electron.
+*   **Backend (nếu là web app):** Flask/Django (Python) hoặc Express.js (Node.js).
+*   **Cơ Sở Dữ Liệu (Tùy chọn, để lưu cài đặt người dùng hoặc OB lịch sử):** SQLite, PostgreSQL.
+
+**5. Các Giai Đoạn Phát Triển:**
+
+*   **Giai Đoạn 1: Logic Cốt Lõi & Xử Lý Dữ Liệu (Proof of Concept - Bằng chứng Khái niệm)**
+    *   [ ] Thiết lập môi trường dự án và kiểm soát phiên bản (Git).
+    *   [ ] Triển khai kết nối API để lấy dữ liệu OHLCV cho một cặp tiền/khung thời gian (ví dụ: Binance, BTC/USDT, 1H).
+    *   [ ] Phát triển thuật toán xác định đỉnh đảo chiều (swing high) và đáy đảo chiều (swing low) (để phát hiện BOS).
+    *   [ ] Triển khai logic phát hiện Khối Lệnh cốt lõi:
+        *   [ ] Xác định các nến Bullish OB tiềm năng.
+        *   [ ] Xác định các nến Bearish OB tiềm năng.
+        *   [ ] Xác thực OB dựa trên việc Phá Vỡ Cấu Trúc sau đó.
+    *   [ ] Xuất kết quả ra console cơ bản hoặc biểu đồ tĩnh đơn giản (ví dụ: sử dụng `mplfinance`) để hiển thị các OB đã phát hiện.
+
+*   **Giai Đoạn 2: Trực Quan Hóa & UI Cơ Bản**
+    *   [ ] Chọn và tích hợp một thư viện vẽ biểu đồ.
+    *   [ ] Hiển thị biểu đồ nến tương tác.
+    *   [ ] Đánh dấu trực quan các OB đã phát hiện (hình chữ nhật) và các điểm/đường BOS trên biểu đồ.
+    *   [ ] Triển khai UI cơ bản để chọn cặp tiền điện tử và khung thời gian.
+
+*   **Giai Đoạn 3: Cải Tiến & Trải Nghiệm Người Dùng**
+    *   [ ] (Tùy chọn) Thêm phát hiện và trực quan hóa FVG.
+    *   [ ] (Tùy chọn) Thêm phân tích khối lượng vào tiêu chí OB.
+    *   [ ] Tinh chỉnh các tham số phát hiện OB và cho phép người dùng tùy chỉnh (nếu có kế hoạch).
+    *   [ ] Cải thiện UI/UX dựa trên thử nghiệm ban đầu.
+    *   [ ] Xử lý lỗi và ghi log.
+
+*   **Giai Đoạn 4: Tính Năng Nâng Cao & Triển Khai (Tùy chọn)**
+    *   [ ] Triển khai hệ thống cảnh báo (ví dụ: email, thông báo trên máy tính).
+    *   [ ] Hỗ trợ nhiều sàn giao dịch.
+    *   [ ] (Nếu là web app) Xác thực người dùng và lưu trữ dữ liệu lâu dài.
+    *   [ ] Module kiểm thử lại (Backtesting) để kiểm tra hiệu quả chiến lược OB (rất phức tạp).
+    *   [ ] Đóng gói và triển khai (ví dụ: PyInstaller cho desktop, Docker cho web).
+
+**6. Luồng Dữ Liệu (Đơn giản hóa):**
+    Người dùng chọn Cặp tiền/Khung thời gian -> Ứng dụng lấy Dữ liệu (API) -> Dữ liệu được Xử lý (Pandas) -> Thuật toán OB Chạy -> OB được Xác định -> Kết quả Hiển thị trên Biểu đồ.
+
+**7. Thách Thức & Cân Nhắc:**
+*   **Định Nghĩa "Đáng Kể" cho Động Thái/BOS:** Việc định lượng thế nào là một động thái bứt phá mạnh mẽ hoặc một BOS hợp lệ có thể mang tính chủ quan và cần tinh chỉnh.
+*   **Tín Hiệu Giả (False Positives):** Hệ thống tự động có thể phát hiện các mẫu hình không phải là OB thực sự trong bối cảnh.
+*   **Vẽ Lại (Repainting):** Đảm bảo các chỉ báo/OB không "vẽ lại" (thay đổi ngược dòng trên các nến đã đóng). Điều này thường không phải là vấn đề đối với OB vì chúng dựa trên hành động giá trong quá khứ.
+*   **Giới Hạn Tốc Độ API (Rate Limits):** Xử lý giới hạn tốc độ API của sàn một cách linh hoạt.
+*   **Dữ Liệu Thời Gian Thực:** Xử lý cập nhật dữ liệu thời gian thực để phát hiện trực tiếp đòi hỏi kiến trúc mạnh mẽ (ví dụ: WebSockets).
+*   **Hiệu Suất:** Xử lý hiệu quả các bộ dữ liệu lịch sử lớn hoặc dữ liệu thời gian thực.
+*   **Tuyên Bố Miễn Trừ Trách Nhiệm:** Ứng dụng là một công cụ phân tích, không phải là lời khuyên tài chính. Giao dịch luôn có rủi ro.
+
+**8. Các Bước Tiếp Theo:**
+1.  Hoàn thiện các quy tắc cụ thể để phát hiện OB từ "Order Block.pdf" nếu chúng khác biệt đáng kể so với các định nghĩa thông thường.
+2.  Bắt đầu với Giai đoạn 1, tập trung vào việc thu thập dữ liệu và thuật toán phát hiện cốt lõi.
+3.  Phát triển và kiểm thử lặp đi lặp lại từng tính năng.
