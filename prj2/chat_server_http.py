@@ -5,7 +5,7 @@ Handles multiple client connections via HTTP and WebSocket, message broadcasting
 """
 
 from flask import Flask, render_template, request
-from flask_socketio import SocketIO, emit, join_room, leave_room
+from flask_socketio import SocketIO, emit
 import json
 import datetime
 import os
@@ -19,8 +19,6 @@ socketio = SocketIO(app, cors_allowed_origins="*")
 # Global variables for client management
 clients: Dict[str, str] = {}  # session_id -> nickname
 nicknames: Set[str] = set()  # active nicknames
-# room_name -> set of session_ids
-rooms: Dict[str, Set[str]] = {'general': set()}
 
 # Logging
 log_dir = "chat_logs"
@@ -81,32 +79,43 @@ def index():
     <title>Chat Room</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
     <style>
-        body { font-family: Arial, sans-serif; margin: 20px; }
-        #messages { border: 1px solid #ccc; height: 400px; overflow-y: scroll; padding: 10px; margin: 10px 0; }
-        #messageInput { width: 70%; padding: 10px; }
-        #sendButton { padding: 10px 20px; }
-        .message { margin: 5px 0; }
-        .system { color: #666; font-style: italic; }
-        .user { color: #333; }
+        body { font-family: Arial, sans-serif; margin: 20px; background-color: #f5f5f5; }
+        .container { max-width: 800px; margin: 0 auto; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        h1 { text-align: center; color: #333; }
+        #messages { border: 1px solid #ccc; height: 400px; overflow-y: scroll; padding: 10px; margin: 10px 0; background: #fafafa; border-radius: 5px; }
+        #messageInput { width: 70%; padding: 10px; border: 1px solid #ccc; border-radius: 5px; }
+        #sendButton { padding: 10px 20px; background: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer; }
+        #sendButton:hover { background: #0056b3; }
+        .message { margin: 5px 0; padding: 5px; border-radius: 3px; }
+        .system { color: #666; font-style: italic; background: #e9ecef; }
+        .user { color: #333; background: #fff; border-left: 3px solid #007bff; padding-left: 10px; }
         .timestamp { color: #999; font-size: 0.8em; }
-        #userList { border: 1px solid #ccc; height: 200px; overflow-y: scroll; padding: 10px; margin: 10px 0; }
+        #userList { border: 1px solid #ccc; height: 150px; overflow-y: scroll; padding: 10px; margin: 10px 0; background: #fafafa; border-radius: 5px; }
+        #nicknameInput { width: 70%; padding: 10px; border: 1px solid #ccc; border-radius: 5px; }
+        .join-button { padding: 10px 20px; background: #28a745; color: white; border: none; border-radius: 5px; cursor: pointer; }
+        .join-button:hover { background: #1e7e34; }
     </style>
 </head>
 <body>
-    <h1>Chat Room</h1>
-    
-    <div id="nicknameSection">
-        <input type="text" id="nicknameInput" placeholder="Enter your nickname..." maxlength="20">
-        <button onclick="setNickname()">Join Chat</button>
-    </div>
-    
-    <div id="chatSection" style="display: none;">
-        <div id="messages"></div>
-        <input type="text" id="messageInput" placeholder="Type your message..." onkeypress="handleKeyPress(event)">
-        <button id="sendButton" onclick="sendMessage()">Send</button>
+    <div class="container">
+        <h1>🔥 Chat Room</h1>
         
-        <h3>Online Users:</h3>
-        <div id="userList"></div>
+        <div id="nicknameSection">
+            <p>Chào mừng! Vui lòng nhập nickname để tham gia chat:</p>
+            <input type="text" id="nicknameInput" placeholder="Nhập nickname của bạn..." maxlength="20">
+            <button class="join-button" onclick="setNickname()">Tham gia Chat</button>
+        </div>
+        
+        <div id="chatSection" style="display: none;">
+            <div id="messages"></div>
+            <div style="margin: 10px 0;">
+                <input type="text" id="messageInput" placeholder="Nhập tin nhắn..." onkeypress="handleKeyPress(event)">
+                <button id="sendButton" onclick="sendMessage()">Gửi</button>
+            </div>
+            
+            <h3>👥 Người dùng online:</h3>
+            <div id="userList"></div>
+        </div>
     </div>
 
     <script>
@@ -119,6 +128,8 @@ def index():
             
             if (proposedNickname) {
                 socket.emit('set_nickname', {nickname: proposedNickname});
+            } else {
+                alert('Vui lòng nhập nickname!');
             }
         }
         
@@ -168,9 +179,15 @@ def index():
             const userList = document.getElementById('userList');
             userList.innerHTML = '';
             
+            if (users.length === 0) {
+                userList.innerHTML = '<em>Chưa có ai online</em>';
+                return;
+            }
+            
             users.forEach(user => {
                 const userDiv = document.createElement('div');
-                userDiv.textContent = user;
+                userDiv.textContent = '🟢 ' + user;
+                userDiv.style.padding = '2px 0';
                 userList.appendChild(userDiv);
             });
         }
@@ -185,6 +202,7 @@ def index():
         
         socket.on('nickname_error', function(data) {
             alert(data.message);
+            document.getElementById('nicknameInput').focus();
         });
         
         socket.on('message', function(data) {
@@ -193,6 +211,14 @@ def index():
         
         socket.on('user_list', function(data) {
             updateUserList(data.users);
+        });
+        
+        socket.on('connect', function() {
+            console.log('Đã kết nối tới server');
+        });
+        
+        socket.on('disconnect', function() {
+            console.log('Mất kết nối tới server');
         });
         
         // Focus nickname input on load
@@ -228,7 +254,7 @@ def handle_disconnect():
         # Notify other users
         socketio.emit('message', {
             "type": "system",
-            "message": f"{nickname} left the chat",
+            "message": f"{nickname} đã rời khỏi phòng chat",
             "timestamp": datetime.datetime.now().isoformat()
         })
 
@@ -258,16 +284,16 @@ def handle_set_nickname(data):
         # Notify other users
         socketio.emit('message', {
             "type": "system",
-            "message": f"{proposed_nickname} joined the chat",
+            "message": f"{proposed_nickname} đã tham gia phòng chat",
             "timestamp": datetime.datetime.now().isoformat()
-        }, room=None, include_self=False)
+        }, include_self=False)
 
         # Send user list to all clients
         socketio.emit('user_list', {"users": list(nicknames)})
 
     else:
         emit('nickname_error', {
-            'message': 'Nickname is invalid or already taken. Please choose another.'
+            'message': 'Nickname không hợp lệ hoặc đã được sử dụng. Vui lòng chọn nickname khác.'
         })
 
 
@@ -315,23 +341,33 @@ def main():
         try:
             port = int(sys.argv[1])
         except ValueError:
-            print("Invalid port number. Using default 5000.")
+            print("Port không hợp lệ. Sử dụng port mặc định 5000.")
 
     # Ensure log directory exists
     ensure_log_directory()
 
-    print("=== Local Network Chat Room Server (HTTP/WebSocket) ===")
-    print(f"Server starting on {host}:{port}")
-    print(f"Debug mode: {'ON' if debug else 'OFF'}")
-    print(f"Access the chat at: http://103.149.252.221:{port}/")
-    print(f"Local access: http://localhost:{port}/")
-    print("Press Ctrl+C to stop the server")
+    print("="*60)
+    print("🔥 LOCAL NETWORK CHAT ROOM SERVER (HTTP/WebSocket)")
+    print("="*60)
+    print(f"📡 Server đang khởi động trên {host}:{port}")
+    print(f"🐛 Debug mode: {'BẬT' if debug else 'TẮT'}")
+    print(f"🌐 Truy cập chat tại: http://103.149.252.221:{port}/")
+    print(f"🏠 Truy cập local: http://localhost:{port}/")
+    print("⚡ Sử dụng Ctrl+C để dừng server")
+    print("="*60)
     print()
 
     log_event(f"Chat server started on {host}:{port}")
 
-    # Start the server
-    socketio.run(app, host=host, port=port, debug=debug)
+    try:
+        # Start the server
+        socketio.run(app, host=host, port=port, debug=debug)
+    except KeyboardInterrupt:
+        print("\n🔴 Đang tắt server...")
+        log_event("Chat server shutting down")
+    except Exception as e:
+        print(f"❌ Lỗi server: {e}")
+        log_event(f"Server error: {e}")
 
 
 if __name__ == "__main__":
