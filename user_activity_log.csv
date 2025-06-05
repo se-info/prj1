@@ -1,0 +1,13 @@
+timestamp,username,action,symbol,timeframe,details,ip_address,session_id
+2025-06-05 10:25:00,Anonymous,ANALYZE,BTC/USDT,1h,Analyzed BTC/USDT on 1h timeframe with light theme,127.0.0.1,
+2025-06-05 10:25:09,Anonymous,ANALYZE,BTC/USDT,1h,Analyzed BTC/USDT on 1h timeframe with light theme,127.0.0.1,
+2025-06-05 11:04:23,Anonymous,ANALYZE,BTC/USDT,1h,Analyzed BTC/USDT on 1h timeframe with dark theme,127.0.0.1,
+2025-06-05 11:16:17,Anonymous,ANALYZE,BTC/USDT,1h,Analyzed BTC/USDT on 1h timeframe with dark theme,127.0.0.1,
+2025-06-05 11:27:45,Anonymous,ANALYZE,BTC/USDT,1h,Analyzed BTC/USDT on 1h timeframe with dark theme,127.0.0.1,
+2025-06-05 11:41:54,Anonymous,ANALYZE,BTC/USDT,1d,Analyzed BTC/USDT on 1d timeframe with dark theme,127.0.0.1,
+2025-06-05 11:45:43,Anonymous,ANALYZE,BTC/USDT,1h,Analyzed BTC/USDT on 1h timeframe with dark theme,127.0.0.1,
+2025-06-05 11:56:59,Anonymous,ANALYZE,BTC/USDT,1h,Analyzed BTC/USDT on 1h timeframe with dark theme,127.0.0.1,
+2025-06-05 13:22:42,testuser,LOGIN,,,User logged in,127.0.0.1,
+2025-06-05 13:22:42,testuser,ANALYZE,BTC/USDT,1h,Analyzed BTC/USDT on 1h timeframe with dark theme,127.0.0.1,
+2025-06-05 13:23:21,testuser,test_action,BTC/USDT,,Testing local app,,
+2025-06-05 13:23:23,Anonymous,ANALYZE,BTC/USDT,1h,Analyzed BTC/USDT on 1h timeframe with dark theme,127.0.0.1,
