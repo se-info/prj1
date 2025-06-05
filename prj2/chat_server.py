@@ -14,9 +14,10 @@ from typing import Dict, List, Set
 
 
 class ChatServer:
-    def __init__(self, host='localhost', port=12345):
+    def __init__(self, host='0.0.0.0', port=5000, debug=True):
         self.host = host
         self.port = port
+        self.debug = debug
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 
@@ -43,6 +44,10 @@ class ChatServer:
         """Log an event to the daily log file."""
         timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         log_entry = f"[{timestamp}] {message}\n"
+
+        # Print to console if debug mode is enabled
+        if self.debug:
+            print(f"DEBUG: {log_entry.strip()}")
 
         try:
             with open(self.get_log_filename(), "a", encoding="utf-8") as f:
@@ -172,7 +177,10 @@ class ChatServer:
                             message_data, client_socket, nickname)
 
                 except Exception as e:
-                    print(f"Error handling client {nickname}: {e}")
+                    if self.debug:
+                        print(f"DEBUG: Error handling client {nickname}: {e}")
+                    else:
+                        print(f"Error handling client {nickname}: {e}")
                     break
 
         except Exception as e:
@@ -343,9 +351,10 @@ def main():
     """Main function to start the server."""
     import sys
 
-    # Default values
-    host = 'localhost'
-    port = 12345
+    # Default values (similar to Flask app.run defaults)
+    host = '0.0.0.0'
+    port = 5000
+    debug = True
 
     # Command line arguments
     if len(sys.argv) > 1:
@@ -354,14 +363,17 @@ def main():
         try:
             port = int(sys.argv[2])
         except ValueError:
-            print("Invalid port number. Using default 12345.")
+            print("Invalid port number. Using default 5000.")
+    if len(sys.argv) > 3:
+        debug = sys.argv[3].lower() in ('true', '1', 'yes', 'on')
 
     print("=== Local Network Chat Room Server ===")
     print(f"Starting server on {host}:{port}")
+    print(f"Debug mode: {'ON' if debug else 'OFF'}")
     print("Press Ctrl+C to stop the server")
     print()
 
-    server = ChatServer(host, port)
+    server = ChatServer(host, port, debug)
     server.start()
 
 
