@@ -106,11 +106,73 @@ def index():
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         
+        :root {
+            /* Default Theme (Red) */
+            --bg-gradient: linear-gradient(135deg, #ff6b6b 0%, #ee5a52 100%);
+            --container-bg: rgba(255,255,255,0.95);
+            --header-gradient: linear-gradient(90deg, #ff4757, #ff3838);
+            --text-color: #333;
+            --sidebar-bg: #f8f9fa;
+            --sidebar-border: #dee2e6;
+            --message-bg: linear-gradient(to bottom, #fafafa, #ffffff);
+            --own-message-bg: linear-gradient(135deg, #ff4757, #ff3838);
+            --other-message-bg: #e9ecef;
+            --system-message-bg: linear-gradient(90deg, #ff6b6b, #ff4757);
+            --input-bg: white;
+            --input-border: #dee2e6;
+            --input-focus: #ff4757;
+            --user-item-bg: white;
+            --emoji-picker-bg: white;
+            --join-card-bg: white;
+            --shadow-color: rgba(0,0,0,0.1);
+        }
+        
+        [data-theme="dark"] {
+            --bg-gradient: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            --container-bg: rgba(44, 62, 80, 0.95);
+            --header-gradient: linear-gradient(90deg, #34495e, #2c3e50);
+            --text-color: #ecf0f1;
+            --sidebar-bg: #2c3e50;
+            --sidebar-border: #34495e;
+            --message-bg: linear-gradient(to bottom, #34495e, #2c3e50);
+            --own-message-bg: linear-gradient(135deg, #3498db, #2980b9);
+            --other-message-bg: #34495e;
+            --system-message-bg: linear-gradient(90deg, #9b59b6, #8e44ad);
+            --input-bg: #34495e;
+            --input-border: #2c3e50;
+            --input-focus: #3498db;
+            --user-item-bg: #34495e;
+            --emoji-picker-bg: #2c3e50;
+            --join-card-bg: #34495e;
+            --shadow-color: rgba(0,0,0,0.3);
+        }
+        
+        [data-theme="white"] {
+            --bg-gradient: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            --container-bg: rgba(255,255,255,0.98);
+            --header-gradient: linear-gradient(90deg, #6c757d, #495057);
+            --text-color: #212529;
+            --sidebar-bg: #ffffff;
+            --sidebar-border: #dee2e6;
+            --message-bg: linear-gradient(to bottom, #ffffff, #f8f9fa);
+            --own-message-bg: linear-gradient(135deg, #007bff, #0056b3);
+            --other-message-bg: #f8f9fa;
+            --system-message-bg: linear-gradient(90deg, #6c757d, #495057);
+            --input-bg: white;
+            --input-border: #ced4da;
+            --input-focus: #007bff;
+            --user-item-bg: white;
+            --emoji-picker-bg: white;
+            --join-card-bg: white;
+            --shadow-color: rgba(0,0,0,0.08);
+        }
+        
         body { 
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: var(--bg-gradient);
             min-height: 100vh;
-            color: #333;
+            color: var(--text-color);
+            transition: all 0.3s ease;
         }
         
         .container { 
@@ -119,23 +181,99 @@ def index():
             height: 100vh;
             display: flex;
             flex-direction: column;
-            background: rgba(255,255,255,0.95);
+            background: var(--container-bg);
             backdrop-filter: blur(10px);
-            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+            box-shadow: 0 8px 32px var(--shadow-color);
+            transition: all 0.3s ease;
         }
         
         .header {
-            background: linear-gradient(90deg, #4CAF50, #45a049);
+            background: var(--header-gradient);
             color: white;
             padding: 20px;
             text-align: center;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 10px var(--shadow-color);
+            position: relative;
         }
         
         .header h1 {
             font-size: 2em;
             margin-bottom: 5px;
             text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .theme-selector {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        
+        .theme-button {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            border: 2px solid white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        
+        .theme-button:hover {
+            transform: scale(1.1);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        }
+        
+        .theme-button.active {
+            border-width: 3px;
+            box-shadow: 0 0 10px rgba(255,255,255,0.8);
+        }
+        
+        .theme-red { background: linear-gradient(135deg, #ff4757, #ff3838); }
+        .theme-dark { background: linear-gradient(135deg, #2c3e50, #34495e); }
+        .theme-white { background: linear-gradient(135deg, #f8f9fa, #e9ecef); border-color: #333; }
+        .theme-custom { background: conic-gradient(from 0deg, #ff6b6b, #4ecdc4, #45b7d1, #f9ca24, #f0932b, #eb4d4b, #6c5ce7); }
+        
+        .theme-label {
+            color: white;
+            font-size: 0.9em;
+            margin-right: 10px;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+        }
+        
+        .custom-theme-panel {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background: var(--join-card-bg);
+            border: 1px solid var(--sidebar-border);
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 8px 25px var(--shadow-color);
+            display: none;
+            z-index: 1000;
+            min-width: 250px;
+            color: var(--text-color);
+        }
+        
+        .color-input-group {
+            margin-bottom: 15px;
+        }
+        
+        .color-input-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-size: 0.9em;
+        }
+        
+        .color-input-group input[type="color"] {
+            width: 100%;
+            height: 40px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
         }
         
         .status-badge {
@@ -155,10 +293,11 @@ def index():
         
         .sidebar {
             width: 300px;
-            background: #f8f9fa;
-            border-right: 1px solid #dee2e6;
+            background: var(--sidebar-bg);
+            border-right: 1px solid var(--sidebar-border);
             display: flex;
             flex-direction: column;
+            transition: all 0.3s ease;
         }
         
         .main-chat {
@@ -171,7 +310,8 @@ def index():
             flex: 1;
             overflow-y: auto;
             padding: 20px;
-            background: linear-gradient(to bottom, #fafafa, #ffffff);
+            background: var(--message-bg);
+            transition: all 0.3s ease;
         }
         
         .message { 
@@ -190,21 +330,21 @@ def index():
         }
         
         .message.own {
-            background: linear-gradient(135deg, #007bff, #0056b3);
+            background: var(--own-message-bg);
             color: white;
             margin-left: auto;
             border-bottom-right-radius: 4px;
         }
         
         .message.other {
-            background: #e9ecef;
-            color: #333;
+            background: var(--other-message-bg);
+            color: var(--text-color);
             margin-right: auto;
             border-bottom-left-radius: 4px;
         }
         
         .message.system { 
-            background: linear-gradient(90deg, #17a2b8, #138496);
+            background: var(--system-message-bg);
             color: white;
             text-align: center;
             margin: 5px auto;
@@ -252,9 +392,10 @@ def index():
         
         .input-area {
             padding: 20px;
-            background: white;
-            border-top: 1px solid #dee2e6;
-            box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+            background: var(--input-bg);
+            border-top: 1px solid var(--sidebar-border);
+            box-shadow: 0 -2px 10px var(--shadow-color);
+            transition: all 0.3s ease;
         }
         
         .input-container {
@@ -266,17 +407,19 @@ def index():
         #messageInput { 
             flex: 1;
             padding: 12px 16px;
-            border: 2px solid #dee2e6;
+            border: 2px solid var(--input-border);
             border-radius: 25px;
             font-size: 14px;
             resize: none;
             max-height: 100px;
             min-height: 44px;
-            transition: border-color 0.3s;
+            transition: all 0.3s;
+            background: var(--input-bg);
+            color: var(--text-color);
         }
         
         #messageInput:focus {
-            border-color: #007bff;
+            border-color: var(--input-focus);
             outline: none;
         }
         
@@ -310,14 +453,16 @@ def index():
             position: absolute;
             bottom: 60px;
             right: 20px;
-            background: white;
-            border: 1px solid #dee2e6;
+            background: var(--emoji-picker-bg);
+            border: 1px solid var(--sidebar-border);
             border-radius: 10px;
             padding: 15px;
-            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+            box-shadow: 0 8px 25px var(--shadow-color);
             display: none;
             max-width: 300px;
             z-index: 1000;
+            color: var(--text-color);
+            transition: all 0.3s ease;
         }
         
         .emoji-grid {
@@ -357,10 +502,11 @@ def index():
             align-items: center;
             padding: 8px 12px;
             margin: 5px 0;
-            background: white;
+            background: var(--user-item-bg);
             border-radius: 10px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            transition: transform 0.2s;
+            box-shadow: 0 2px 5px var(--shadow-color);
+            transition: all 0.3s ease;
+            color: var(--text-color);
         }
         
         .user-item:hover {
@@ -386,12 +532,14 @@ def index():
         }
         
         .join-card {
-            background: white;
+            background: var(--join-card-bg);
             padding: 40px;
             border-radius: 20px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            box-shadow: 0 10px 30px var(--shadow-color);
             max-width: 400px;
             width: 100%;
+            transition: all 0.3s ease;
+            color: var(--text-color);
         }
         
         .join-card h2 {
@@ -409,15 +557,17 @@ def index():
         #nicknameInput { 
             width: 100%;
             padding: 15px;
-            border: 2px solid #dee2e6;
+            border: 2px solid var(--input-border);
             border-radius: 10px;
             font-size: 16px;
             margin-bottom: 20px;
-            transition: border-color 0.3s;
+            transition: all 0.3s;
+            background: var(--input-bg);
+            color: var(--text-color);
         }
         
         #nicknameInput:focus {
-            border-color: #007bff;
+            border-color: var(--input-focus);
             outline: none;
         }
         
@@ -474,13 +624,66 @@ def index():
             .sidebar { width: 100%; max-height: 200px; }
             .message { max-width: 90%; }
             .input-container { flex-wrap: wrap; }
+            
+            .theme-selector {
+                position: relative;
+                top: auto;
+                right: auto;
+                margin-bottom: 10px;
+                justify-content: center;
+            }
+            
+            .theme-label {
+                font-size: 0.8em;
+            }
+            
+            .theme-button {
+                width: 25px;
+                height: 25px;
+            }
+            
+            .custom-theme-panel {
+                position: fixed;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                width: 90%;
+                max-width: 300px;
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <h1>🔥 Advanced Chat Room <span class="status-badge">SSL Fixed</span></h1>
+            <div class="theme-selector">
+                <span class="theme-label">🎨</span>
+                <div class="theme-button theme-red active" data-theme="default" title="Chủ đề đỏ (mặc định)"></div>
+                <div class="theme-button theme-dark" data-theme="dark" title="Chế độ tối"></div>
+                <div class="theme-button theme-white" data-theme="white" title="Chế độ sáng"></div>
+                <div class="theme-button theme-custom" data-theme="custom" title="Tùy chỉnh màu sắc"></div>
+                <div class="custom-theme-panel" id="customThemePanel">
+                    <h4 style="margin-bottom: 15px;">🎨 Tùy chỉnh màu sắc</h4>
+                    <div class="color-input-group">
+                        <label>Màu nền chính:</label>
+                        <input type="color" id="bgColor1" value="#ff6b6b">
+                    </div>
+                    <div class="color-input-group">
+                        <label>Màu nền phụ:</label>
+                        <input type="color" id="bgColor2" value="#ee5a52">
+                    </div>
+                    <div class="color-input-group">
+                        <label>Màu tin nhắn của bạn:</label>
+                        <input type="color" id="ownMessageColor" value="#ff4757">
+                    </div>
+                    <div class="color-input-group">
+                        <label>Màu header:</label>
+                        <input type="color" id="headerColor" value="#ff4757">
+                    </div>
+                    <button onclick="applyCustomTheme()" style="width: 100%; padding: 10px; background: var(--input-focus); color: white; border: none; border-radius: 5px; cursor: pointer;">Áp dụng</button>
+                </div>
+            </div>
+            <h1>🔥 Private Room <span class="status-badge">SSL Fixed</span></h1>
             <p>Kết nối, chia sẻ và trò chuyện cùng bạn bè - Không có lỗi SSL!</p>
         </div>
         
@@ -546,7 +749,128 @@ def index():
         let currentUsers = [];
         let typingTimeout = null;
         let isTyping = false;
+        let currentTheme = 'default';
         
+        // Theme management
+        function initThemeSystem() {
+            // Load saved theme from localStorage
+            const savedTheme = localStorage.getItem('chatTheme') || 'default';
+            switchTheme(savedTheme);
+            
+            // Add click handlers for theme buttons
+            document.querySelectorAll('.theme-button').forEach(button => {
+                button.addEventListener('click', function() {
+                    const theme = this.getAttribute('data-theme');
+                    if (theme === 'custom') {
+                        toggleCustomThemePanel();
+                    } else {
+                        switchTheme(theme);
+                    }
+                });
+            });
+            
+            // Close custom panel when clicking outside
+            document.addEventListener('click', function(e) {
+                const panel = document.getElementById('customThemePanel');
+                const customButton = document.querySelector('[data-theme="custom"]');
+                if (!panel.contains(e.target) && !customButton.contains(e.target)) {
+                    panel.style.display = 'none';
+                }
+            });
+        }
+        
+        function switchTheme(theme) {
+            const body = document.body;
+            const themeButtons = document.querySelectorAll('.theme-button');
+            
+            // Remove active class from all buttons
+            themeButtons.forEach(btn => btn.classList.remove('active'));
+            
+            // Set theme attribute
+            if (theme === 'default') {
+                body.removeAttribute('data-theme');
+                document.querySelector('[data-theme="default"]').classList.add('active');
+            } else {
+                body.setAttribute('data-theme', theme);
+                document.querySelector(`[data-theme="${theme}"]`).classList.add('active');
+            }
+            
+            currentTheme = theme;
+            localStorage.setItem('chatTheme', theme);
+            
+            // Hide custom panel
+            document.getElementById('customThemePanel').style.display = 'none';
+        }
+        
+        function toggleCustomThemePanel() {
+            const panel = document.getElementById('customThemePanel');
+            const isVisible = panel.style.display === 'block';
+            panel.style.display = isVisible ? 'none' : 'block';
+            
+            if (!isVisible) {
+                // Load current custom colors if any
+                loadCustomColors();
+            }
+        }
+        
+        function loadCustomColors() {
+            const customTheme = localStorage.getItem('customTheme');
+            if (customTheme) {
+                const colors = JSON.parse(customTheme);
+                document.getElementById('bgColor1').value = colors.bgColor1 || '#ff6b6b';
+                document.getElementById('bgColor2').value = colors.bgColor2 || '#ee5a52';
+                document.getElementById('ownMessageColor').value = colors.ownMessageColor || '#ff4757';
+                document.getElementById('headerColor').value = colors.headerColor || '#ff4757';
+            }
+        }
+        
+        function applyCustomTheme() {
+            const bgColor1 = document.getElementById('bgColor1').value;
+            const bgColor2 = document.getElementById('bgColor2').value;
+            const ownMessageColor = document.getElementById('ownMessageColor').value;
+            const headerColor = document.getElementById('headerColor').value;
+            
+            // Save custom colors
+            const customColors = { bgColor1, bgColor2, ownMessageColor, headerColor };
+            localStorage.setItem('customTheme', JSON.stringify(customColors));
+            
+            // Apply custom theme
+            const root = document.documentElement;
+            root.style.setProperty('--bg-gradient', `linear-gradient(135deg, ${bgColor1} 0%, ${bgColor2} 100%)`);
+            root.style.setProperty('--header-gradient', `linear-gradient(90deg, ${headerColor}, ${headerColor}dd)`);
+            root.style.setProperty('--own-message-bg', `linear-gradient(135deg, ${ownMessageColor}, ${ownMessageColor}dd)`);
+            root.style.setProperty('--system-message-bg', `linear-gradient(90deg, ${ownMessageColor}, ${headerColor})`);
+            root.style.setProperty('--input-focus', ownMessageColor);
+            
+            // Update active theme
+            document.querySelectorAll('.theme-button').forEach(btn => btn.classList.remove('active'));
+            document.querySelector('[data-theme="custom"]').classList.add('active');
+            
+            currentTheme = 'custom';
+            localStorage.setItem('chatTheme', 'custom');
+            
+            // Hide panel
+            document.getElementById('customThemePanel').style.display = 'none';
+            
+            showNotification('🎨 Chủ đề tùy chỉnh', 'Đã áp dụng màu sắc mới!');
+        }
+        
+        // Load custom theme if it was previously applied
+        function loadSavedCustomTheme() {
+            if (currentTheme === 'custom') {
+                const customTheme = localStorage.getItem('customTheme');
+                if (customTheme) {
+                    const colors = JSON.parse(customTheme);
+                    const root = document.documentElement;
+                    root.style.setProperty('--bg-gradient', `linear-gradient(135deg, ${colors.bgColor1} 0%, ${colors.bgColor2} 100%)`);
+                    root.style.setProperty('--header-gradient', `linear-gradient(90deg, ${colors.headerColor}, ${colors.headerColor}dd)`);
+                    root.style.setProperty('--own-message-bg', `linear-gradient(135deg, ${colors.ownMessageColor}, ${colors.ownMessageColor}dd)`);
+                    root.style.setProperty('--system-message-bg', `linear-gradient(90deg, ${colors.ownMessageColor}, ${colors.headerColor})`);
+                    root.style.setProperty('--input-focus', colors.ownMessageColor);
+                }
+            }
+        }
+
         // Emoji list
         const emojis = [
             '😀', '😃', '😄', '😁', '😆', '😅', '😂', '🤣', '😊', '😇', '🙂', '🙃', '😉', '😌', '😍', '🥰',
@@ -846,6 +1170,8 @@ def index():
         // Initialize
         document.addEventListener('DOMContentLoaded', function() {
             initEmojiPicker();
+            initThemeSystem();
+            loadSavedCustomTheme();
             document.getElementById('nicknameInput').focus();
             document.getElementById('messageInput').addEventListener('keypress', handleKeyPress);
             document.getElementById('nicknameInput').addEventListener('keypress', handleKeyPress);
