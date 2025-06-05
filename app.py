@@ -670,14 +670,19 @@ class OrderBlockDetector:
             row=2, col=1
         )
 
+<<<<<<< HEAD
         # Apply theme
         template = 'plotly_dark' if theme == 'dark' else 'plotly_white'
 
+=======
+        # Enhanced chart layout with free scrolling/zooming
+>>>>>>> 2fae4d85f3ae6e749160bb59b550d1ee529e7b16
         fig.update_layout(
             title=f'{symbol} - Price Chart with Order Blocks & Trend Lines',
             xaxis_rangeslider_visible=False,
             height=800,
             showlegend=True,
+<<<<<<< HEAD
             template=template,
             # Add crosshair cursor for price measurement
             hovermode='x unified',
@@ -728,6 +733,39 @@ class OrderBlockDetector:
             spikemode="across",
             spikethickness=1,
             row=1, col=1
+=======
+            template='plotly_dark',
+            # Enable free drag mode for panning
+            dragmode='pan',
+            # Better selection options
+            selectdirection='any',
+            # Configure additional interaction settings
+            hovermode='closest',
+            # Add margin for better viewing
+            margin=dict(l=50, r=50, t=80, b=50)
+        )
+
+        # Configure X-axis for better interaction
+        fig.update_xaxes(
+            rangeslider_visible=False,
+            # Enable zooming and panning
+            showspikes=True,
+            spikemode='across',
+            spikesnap='cursor',
+            spikedash='solid',
+            spikecolor='#999999',
+            spikethickness=1
+        )
+
+        # Configure Y-axis for better interaction
+        fig.update_yaxes(
+            showspikes=True,
+            spikemode='across',
+            spikesnap='cursor',
+            spikedash='solid',
+            spikecolor='#999999',
+            spikethickness=1
+>>>>>>> 2fae4d85f3ae6e749160bb59b550d1ee529e7b16
         )
 
         return fig
@@ -1022,38 +1060,6 @@ def get_user_logs(username):
         logs.reverse()
 
         return jsonify({'logs': logs})
-    except Exception as e:
-        return jsonify({'error': str(e)}), 500
-
-
-@app.route('/api/logs/download/<username>')
-def download_user_logs(username):
-    """Download user logs as CSV file"""
-    try:
-        from flask import send_file
-        import tempfile
-
-        # Create temporary file with user-specific logs
-        temp_file = tempfile.NamedTemporaryFile(
-            mode='w', delete=False, suffix='.csv', encoding='utf-8')
-
-        with open(user_logger.log_file, 'r', encoding='utf-8') as source_file:
-            reader = csv.DictReader(source_file)
-            writer = csv.DictWriter(temp_file, fieldnames=reader.fieldnames)
-            writer.writeheader()
-
-            for row in reader:
-                if row['username'].lower() == username.lower():
-                    writer.writerow(row)
-
-        temp_file.close()
-
-        return send_file(
-            temp_file.name,
-            as_attachment=True,
-            download_name=f'{username}_activity_log.csv',
-            mimetype='text/csv'
-        )
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 

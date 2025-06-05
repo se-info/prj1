@@ -316,9 +316,28 @@
             min-height: 600px;
             border-radius: 15px;
             overflow: hidden;
+            position: relative;
+            touch-action: none;  /* This improves touch handling */
+            -ms-touch-action: none;
+            user-select: none;
+            -webkit-user-select: none;
         }
         
+        /* Responsive adjustments for better touch experience */
         @media (max-width: 768px) {
+            .chart-container {
+                height: 500px; /* Smaller height on mobile */
+                min-height: auto;
+                border-radius: 10px;
+                margin: 0 -10px; /* Expand slightly to maximize space */
+            }
+            
+            /* Enhance touch targets on mobile */
+            .modebar-btn {
+                padding: 6px !important;
+                margin: 2px 4px !important;
+            }
+            
             .container-fluid {
                 padding: 10px;
             }
@@ -898,6 +917,7 @@
                 
                 // Display chart
                 const chartData = JSON.parse(data.chart);
+<<<<<<< HEAD
                 
                 // Debug: Log chart data to console
                 console.log('Chart data received:', {
@@ -965,6 +985,37 @@
                         handleMeasurementClick(data.points[0]);
                     }
                 });
+=======
+                Plotly.newPlot('chartContainer', chartData.data, chartData.layout, {
+                    responsive: true,
+                    // Enable better mouse wheel and touch gesture handling
+                    scrollZoom: true,
+                    modeBarButtonsToAdd: ['drawopenpath', 'eraseshape'],
+                    modeBarButtonsToRemove: ['lasso2d'],
+                    // Enhanced touch support for mobile
+                    displayModeBar: true,
+                    displaylogo: false,
+                    doubleClick: 'reset+autosize',
+                    // Enable touch support
+                    editable: false,
+                    showAxisDragHandles: true,
+                    showAxisRangeEntryBoxes: true,
+                    toImageButtonOptions: {
+                        format: 'png',
+                        filename: `${symbol}_${timeframe}_analysis`,
+                        height: 800,
+                        width: 1200,
+                        scale: 2
+                    }
+                }).then(function() {
+                    // Apply our custom interaction enhancements
+                    enhanceChartInteractions();
+                });
+                
+                // Add event listeners for better touch support on mobile
+                const chartElement = document.getElementById('chartContainer');
+                chartElement.style.touchAction = 'none'; // Disable browser's default touch actions
+>>>>>>> 2fae4d85f3ae6e749160bb59b550d1ee529e7b16
                 
                 // Update statistics
                 document.getElementById('bullishOBs').textContent = data.stats.bullish_obs;
@@ -1006,7 +1057,126 @@
             }
         });
 
-        // Display Trading Signals
+        // Function to enhance chart interactions
+        function enhanceChartInteractions() {
+            const chartContainer = document.getElementById('chartContainer');
+            if (!chartContainer) return;
+            
+            // Helper function to check if we're on mobile
+            const isMobileDevice = () => {
+                return (typeof window.orientation !== "undefined") || 
+                       (navigator.userAgent.indexOf('IEMobile') !== -1) ||
+                       window.matchMedia("(max-width: 768px)").matches;
+            };
+            
+            // Add wheel event listener for smoother zooming on desktop
+            chartContainer.addEventListener('wheel', function(e) {
+                if (!e.ctrlKey) return; // Only zoom when Ctrl is pressed for better UX
+                e.preventDefault();
+                
+                const gd = document.getElementById('chartContainer');
+                if (!gd || !gd._fullLayout) return;
+                
+                // Get current ranges
+                const xRange = gd._fullLayout.xaxis.range;
+                const yRange = gd._fullLayout.yaxis.range;
+                
+                // Calculate zoom factor (adjust 0.05 to control zoom speed)
+                const zoomFactor = e.deltaY < 0 ? 0.95 : 1.05; 
+                
+                // Apply zoom
+                const xMiddle = (xRange[0] + xRange[1]) / 2;
+                const yMiddle = (yRange[0] + yRange[1]) / 2;
+                
+                const newXRange = [
+                    xMiddle - (xMiddle - xRange[0]) * zoomFactor,
+                    xMiddle + (xRange[1] - xMiddle) * zoomFactor
+                ];
+                
+                const newYRange = [
+                    yMiddle - (yMiddle - yRange[0]) * zoomFactor,
+                    yMiddle + (yRange[1] - yMiddle) * zoomFactor
+                ];
+                
+                Plotly.relayout(gd, {
+                    'xaxis.range': newXRange,
+                    'yaxis.range': newYRange
+                });
+            }, {passive: false});
+            
+            // Add pinch-zoom support for mobile devices
+            let initialDist = 0;
+            let initialRange = {};
+            
+            chartContainer.addEventListener('touchstart', function(e) {
+                if (e.touches.length === 2) {
+                    e.preventDefault();
+                    
+                    const gd = document.getElementById('chartContainer');
+                    if (!gd || !gd._fullLayout) return;
+                    
+                    // Store initial finger distance
+                    const touch1 = e.touches[0];
+                    const touch2 = e.touches[1];
+                    initialDist = Math.hypot(
+                        touch2.clientX - touch1.clientX,
+                        touch2.clientY - touch1.clientY
+                    );
+                    
+                    // Store initial axis ranges
+                    initialRange = {
+                        xaxis: [...gd._fullLayout.xaxis.range],
+                        yaxis: [...gd._fullLayout.yaxis.range]
+                    };
+                }
+            }, {passive: false});
+            
+            chartContainer.addEventListener('touchmove', function(e) {
+                if (e.touches.length === 2 && initialDist > 0) {
+                    e.preventDefault();
+                    
+                    const gd = document.getElementById('chartContainer');
+                    if (!gd || !gd._fullLayout) return;
+                    
+                    // Calculate new distance
+                    const touch1 = e.touches[0];
+                    const touch2 = e.touches[1];
+                    const newDist = Math.hypot(
+                        touch2.clientX - touch1.clientX,
+                        touch2.clientY - touch1.clientY
+                    );
+                    
+                    // Calculate zoom factor
+                    const zoomFactor = initialDist / newDist;
+                    
+                    // Apply zoom relative to center of pinch
+                    const xMiddle = (initialRange.xaxis[0] + initialRange.xaxis[1]) / 2;
+                    const yMiddle = (initialRange.yaxis[0] + initialRange.yaxis[1]) / 2;
+                    
+                    const newXRange = [
+                        xMiddle - (xMiddle - initialRange.xaxis[0]) * zoomFactor,
+                        xMiddle + (initialRange.xaxis[1] - xMiddle) * zoomFactor
+                    ];
+                    
+                    const newYRange = [
+                        yMiddle - (yMiddle - initialRange.yaxis[0]) * zoomFactor,
+                        yMiddle + (initialRange.yaxis[1] - yMiddle) * zoomFactor
+                    ];
+                    
+                    Plotly.relayout(gd, {
+                        'xaxis.range': newXRange,
+                        'yaxis.range': newYRange
+                    });
+                }
+            }, {passive: false});
+            
+            chartContainer.addEventListener('touchend', function(e) {
+                initialDist = 0;
+                initialRange = {};
+            });
+        }
+
+        // Apply chart enhancements when chart is updated
         function displayTradingSignals(signals) {
             const signalsCard = document.getElementById('tradingSignalsCard');
             const signalsContent = document.getElementById('tradingSignalsContent');
@@ -1074,6 +1244,9 @@
             
             signalsContent.innerHTML = signalsHTML;
             signalsCard.style.display = 'block';
+            
+            // Apply chart enhancements after chart is updated
+            enhanceChartInteractions();
         }
 
         // Theme switching functionality
